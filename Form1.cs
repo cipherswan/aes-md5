@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -62,8 +62,7 @@ namespace AES_test
         {
             byte[] decryptedBytes = null;
 
-            // Set your salt here, change it to meet your flavor:
-            // The salt bytes must be at least 8 bytes.
+            
             byte[] saltBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
 
             using (MemoryStream ms = new MemoryStream())
@@ -99,7 +98,7 @@ namespace AES_test
             byte[] bytesToBeEncrypted = File.ReadAllBytes(file);
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
 
-            // Hash the password with SHA256
+            
             passwordBytes = MD5.Create().ComputeHash(passwordBytes);
 
             byte[] bytesEncrypted = AES_Encrypt(bytesToBeEncrypted, passwordBytes);
@@ -119,6 +118,9 @@ namespace AES_test
             }
 
             md5Label.Text = sb.ToString();
+
+            string createText = sb.ToString();
+           File.WriteAllText(@"C:\Users\Mindaugas\Desktop\hash.txt", createText);
         }
 
 
