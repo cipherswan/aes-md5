@@ -38,6 +38,7 @@
             this.pswLabel = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.md5Label = new System.Windows.Forms.Label();
+            this.pswTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // button1
@@ -121,11 +122,19 @@
             this.md5Label.TabIndex = 7;
             this.md5Label.Text = "....";
             // 
+            // pswTextBox
+            // 
+            this.pswTextBox.Location = new System.Drawing.Point(31, 89);
+            this.pswTextBox.Name = "pswTextBox";
+            this.pswTextBox.Size = new System.Drawing.Size(100, 20);
+            this.pswTextBox.TabIndex = 9;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(642, 309);
+            this.Controls.Add(this.pswTextBox);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.md5Label);
             this.Controls.Add(this.pswLabel);
@@ -155,6 +164,7 @@
         private System.Windows.Forms.Label pswLabel;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label md5Label;
+        private System.Windows.Forms.TextBox pswTextBox;
     }
 }
 
