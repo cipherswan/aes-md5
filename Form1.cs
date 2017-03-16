@@ -12,6 +12,7 @@ using System.Security;
 using System.Security.Cryptography;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace AES_test
 {
@@ -141,11 +142,11 @@ namespace AES_test
         }
 
 
-        void dirMethod()
+        void dirMethod(object obj)
         {
-
-            string psw = "swanswanswans";
-            pswLabel.Text = psw;
+           // string psw = Convert.ToString(obj);
+             string psw = pswLabel.Text;
+            //    pswLabel.Text = psw;
             string directory = dirTextBox.Text;
             string fileName = "*";
             int i = 1;
@@ -154,17 +155,20 @@ namespace AES_test
 
             foreach (string path in paths)
             {
-                richTextBox1.AppendText(Environment.NewLine + path);
-                richTextBox1.ScrollToCaret();
-                EncryptFile(path, psw);
+                this.BeginInvoke((MethodInvoker)delegate
+                {
+                    richTextBox1.AppendText(Environment.NewLine + path);
+                    richTextBox1.ScrollToCaret();
+                    EncryptFile(path, psw);
 
-                i++;
+                    i++;
+                });
+                Thread.Sleep(500);
             }
         }
+ 
 
-
-
-        void dirMethodDcrpt()
+        void dirMethodDcrpt(object obj)
         {
             string directory = @"C:\Users\Mindaugas\Desktop\decrypted_files";
             string fileName = "*";
@@ -179,11 +183,17 @@ namespace AES_test
 
             foreach (string path in paths)
             {
-                richTextBox1.AppendText(Environment.NewLine + path);
+
+                this.BeginInvoke((MethodInvoker)delegate
+                {
+
+                    richTextBox1.AppendText(Environment.NewLine + path);
                 richTextBox1.ScrollToCaret();
                 DecryptFile(path, psw);
 
                 i++;
+                });
+                Thread.Sleep(500);
             }
         }
 
@@ -204,12 +214,21 @@ namespace AES_test
 
         private void EncryptBtn_Click(object sender, EventArgs e)
         {
-            dirMethod();
+
+            string psw = pswTextBox.Text;
+            pswLabel.Text = psw;
+            Thread thread1 = new Thread(new ParameterizedThreadStart(dirMethod));
+            thread1.Start();
+
+            // dirMethod();
         }
 
         private void DecryptBtn_Click(object sender, EventArgs e)
         {
-            dirMethodDcrpt();
+            Thread thread2 = new Thread(new ParameterizedThreadStart(dirMethodDcrpt));
+            thread2.Start();
+
+          // dirMethodDcrpt();
         }
     }
 }
