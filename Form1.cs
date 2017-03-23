@@ -18,6 +18,13 @@ namespace AES_test
 {
     public partial class Form1 : Form
     {
+
+        private Thread thread;
+        private Thread thread2;
+        private Thread threadProg;
+        private ManualResetEvent mre = new ManualResetEvent(false);
+
+
         public Form1()
         {
             InitializeComponent();
@@ -139,17 +146,47 @@ namespace AES_test
 
             string file = @"C:\Users\Mindaugas\Desktop\decrypted_files\" + Path.GetFileName(fileEncrypted);
             File.WriteAllBytes(file, bytesDecrypted);
+
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < passwordBytes.Length; i++)
+
+            {
+
+                sb.Append(passwordBytes[i].ToString("X2"));
+
+            }
+
+            md5LabelD.Text = sb.ToString();
+
+            if (md5Label.Text == md5LabelD.Text)
+            {
+                label2.Text = "lygūs";
+            }
+            else
+            {
+                label2.Text = "nelygūs";
+            }
         }
 
 
         void dirMethod(object obj)
         {
-           // string psw = Convert.ToString(obj);
-             string psw = pswLabel.Text;
+            // string psw = Convert.ToString(obj);
+
+            //string psw = pswLabel.Text;
+
+            string psw = pswTextBox.Text;
+
+
+
+
             //    pswLabel.Text = psw;
             string directory = dirTextBox.Text;
             string fileName = "*";
             int i = 1;
+
+            
 
             string[] paths = Directory.GetFiles(directory, fileName, SearchOption.AllDirectories);
 
@@ -164,6 +201,7 @@ namespace AES_test
                     i++;
                 });
                 Thread.Sleep(500);
+                mre.WaitOne();
             }
         }
  
@@ -172,7 +210,7 @@ namespace AES_test
         {
             string directory = @"C:\Users\Mindaugas\Desktop\decrypted_files";
             string fileName = "*";
-            string psw = pswLabel.Text;
+            string psw = pswTextBox.Text;
             int i = 1;
             
 
@@ -194,6 +232,7 @@ namespace AES_test
                 i++;
                 });
                 Thread.Sleep(500);
+                mre.WaitOne();
             }
         }
 
@@ -212,23 +251,118 @@ namespace AES_test
             }
         }
 
+        void progressMethod(object obj)
+        {
+            int n = Convert.ToInt32(obj);
+            
+            
+
+            for (int i = 0; i <= n; i++)
+            {
+                this.BeginInvoke((MethodInvoker)delegate
+                {
+                    progressBar1.Value = i;
+                    progressBar1.Maximum = n;
+
+                });
+
+                Thread.Sleep(500);
+                mre.WaitOne();
+            }
+        }
+
         private void EncryptBtn_Click(object sender, EventArgs e)
         {
 
             string psw = pswTextBox.Text;
-            pswLabel.Text = psw;
-            Thread thread1 = new Thread(new ParameterizedThreadStart(dirMethod));
-            thread1.Start();
+            //pswLabel.Text = psw;
+            string directory = dirTextBox.Text;
+            string fileName = "*"; 
+
+            int n = Directory.GetFiles(directory, fileName, SearchOption.AllDirectories).Length;
+
+            if (thread == null || thread?.IsAlive == false && thread2 == null || thread2?.IsAlive == false)
+            {
+                thread = new Thread(new ParameterizedThreadStart(dirMethod));
+                thread.Start();
+                thread.IsBackground = true;
+
+                threadProg = new Thread(new ParameterizedThreadStart(progressMethod));
+                threadProg.Start(n);
+                threadProg.IsBackground = true;
+
+                mre = new ManualResetEvent(true);
+                
+            }
+            else
+            {
+                MessageBox.Show("A thread is already running");
+            }
+
+            //Thread thread1 = new Thread(new ParameterizedThreadStart(dirMethod));
+            //thread1.Start();
 
             // dirMethod();
         }
 
         private void DecryptBtn_Click(object sender, EventArgs e)
         {
-            Thread thread2 = new Thread(new ParameterizedThreadStart(dirMethodDcrpt));
-            thread2.Start();
+            string directory = dirTextBox.Text;
+            string fileName = "*";
+            int n = Directory.GetFiles(directory, fileName, SearchOption.AllDirectories).Length;
 
-          // dirMethodDcrpt();
+            if (thread2 == null || thread2?.IsAlive == false)
+            {
+                thread2 = new Thread(new ParameterizedThreadStart(dirMethodDcrpt));
+                thread2.Start();
+                thread2.IsBackground = true;
+
+                threadProg = new Thread(new ParameterizedThreadStart(progressMethod));
+                threadProg.Start(n);
+                threadProg.IsBackground = true;
+
+                mre = new ManualResetEvent(true);
+
+            }
+            else
+            {
+                MessageBox.Show("A thread is already running");
+            }
+
+
+            //Thread thread2 = new Thread(new ParameterizedThreadStart(dirMethodDcrpt));
+            //thread2.Start();
+
+            // dirMethodDcrpt();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            //pause
+
+            mre.Reset();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            //continue
+
+            mre.Set();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            // cancel WIP
+
+            if (thread2 != null || thread2?.IsAlive == true)
+            {
+                MessageBox.Show("vyksta decrypt");
+            }
+            else
+            {
+                MessageBox.Show("Nevyksta");
+            }
+          
         }
     }
 }
